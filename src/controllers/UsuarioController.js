@@ -23,11 +23,7 @@ module.exports = {
             }).catch(err => {
                 return err;
             });
-            
-        if(!(IdUsuario > 0)){
-            return response.status(400).json({error: 'Não Foi possível Cadastrar esse Usuário!'})
-        }
 
-        return response.json({nomeusuario});
+        return response.json({IdUsuario});
     }
 }
