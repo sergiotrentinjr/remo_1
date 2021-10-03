@@ -7,13 +7,13 @@ const app = express();
 
 const environment = process.env.NODE_ENV || 'development';
 
-if (environment == 'development'){
-  app.use(cors());
-}else{
+//if (environment == 'development'){
+//  app.use(cors());
+//}else{
   app.use(cors({
-      origin: 'https://remoutfpr.herokuapp.com'
+      origin: '*'
   }));
-}
+//}
 
 app.use(express.json());
 app.use(routes);
