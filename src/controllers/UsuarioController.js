@@ -15,7 +15,7 @@ module.exports = {
 
         const hash = crypto.createHmac('sha256', secret).update(senha).digest('hex')
 
-        const IdUsuario = await connection('usuario').insert({
+        await connection('usuario').insert({
                 nome,
                 senha  : hash,
                 nomeusuario,
@@ -24,6 +24,6 @@ module.exports = {
                 return err;
             });
 
-        return response.json({IdUsuario});
+        return response.json({sucesso: 'Cadastro Realizado com Sucesso!'});
     }
 }
