@@ -13,16 +13,26 @@ module.exports = {
     async create(request, response){
         const {nome, senha, nomeusuario, email} = request.body;
 
-        const hash = crypto.createHmac('sha256', secret).update(senha).digest('hex')
+        console.log(senha)
 
-        await connection('usuario').insert({
+        const [usuarios] = await connection('usuario').select('*').where('email',email);
+
+        if (usuarios) {
+            if (usuarios.idusuario > 0) return response.json({erro: 'E-mail já cadastrado!'});
+        }
+
+        //const hash = crypto.createHmac('sha256', secret).update(senha).digest('hex')
+
+        const idcadastro =  await connection('usuario').insert({
                 nome,
-                senha  : hash,
+                senha,
                 nomeusuario,
                 email,
-            }).catch(err => {
-                return err;
-            });
+        }).returning('idusuario').catch(err => {
+            return err;
+        });
+
+        console.log(idcadastro);
 
         return response.json({sucesso: 'Cadastro Realizado com Sucesso!'});
     }

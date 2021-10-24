@@ -17,12 +17,49 @@ module.exports = {
         .join('estoria_usuario', 'estoria_usuario.idestoria', '=', 'tarefa.idestoria')
         .join('projeto', 'projeto.idprojeto', '=', 'estoria_usuario.idprojeto')
         .leftJoin('sprint', 'sprint.idsprint', '=', 'tarefa.idsprint')
-        .select('tarefa.*','estoria_usuario.nome as funcionalidade','sprint.titulo as descrsprint',)
+        .select('tarefa.*','estoria_usuario.descricao as descreu','sprint.titulo as descrsprint', 'estoria_usuario.persona as persona','estoria_usuario.desejo as desejo')
         .orderBy('sprint.idsprint','desc')
         .orderBy('tarefa.status','asc')
         .where('projeto.idprojeto',idprojeto);
 
         return response.json(tarefa);
+    },
+
+    async delete (request, response){
+        const {id} = request.params;
+        const idUsuario = request.headers.authorization;
+        let RegLog = '';
+        let idproject = 0;
+
+        const [tarefa] = await connection('tarefa')
+        .join('estoria_usuario', 'estoria_usuario.idestoria', '=', 'tarefa.idestoria')
+        .join('projeto_usuario', 'projeto_usuario.idprojeto', '=', 'estoria_usuario.idprojeto')
+        .join('usuario', 'usuario.idusuario', '=', 'projeto_usuario.idusuario')
+        .join('projeto','projeto.idprojeto','=','projeto_usuario.idprojeto')
+        .where('usuario.idusuario', idUsuario).where('tarefa.idtarefa',id)
+        .select('usuario.nome as nome','projeto.titulo as titulo', 'tarefa.descricao as descrtarefa', 'projeto.idprojeto as idprojeto')
+        .catch(err => {
+            return err;
+        });
+
+        if (!tarefa) {
+            return response.json({ retorno: 'Operação não permitida.'});
+        }
+
+        RegLog = " Deletado a Tarefa: " + tarefa.descrtarefa + ", do Projeto: " + tarefa.titulo + ", pelo Usuário: "+ tarefa.nome
+        idproject = tarefa.idprojeto
+
+        await connection('tarefa').where('idtarefa', id).delete()
+
+        await connection('log_tabelas').insert({
+            alteracao: RegLog, 
+            tabela: 'Tarefa',
+            idprojeto: idproject,
+        }).catch(err => {
+            return err;
+        });
+
+        return response.json({ retorno: 'Exclusão realizado com Sucesso!'});
     },
 
     async indexDoc(request, response){
@@ -88,14 +125,14 @@ module.exports = {
         let EUNova = '';
         let Logs = '';
         let idproje;
-       
+
         /* log manual */
         const [TarefaAntiga] = await connection('tarefa')
         .join('estoria_usuario','estoria_usuario.idestoria', '=', 'tarefa.idestoria')
         .join('projeto_usuario', 'projeto_usuario.idprojeto', '=', 'estoria_usuario.idprojeto')
         .join('usuario', 'usuario.idusuario', '=', 'projeto_usuario.idusuario')
         .leftJoin('sprint', 'sprint.idsprint', '=', 'tarefa.idsprint')
-        .select('tarefa.*', 'projeto_usuario.idprojeto as codproj', 'sprint.titulo as descrsprint', 'sprint.idsprint', 'estoria_usuario.nome as descreu','usuario.nome as usuarionome', 'usuario.email as email')
+        .select('tarefa.*', 'projeto_usuario.idprojeto as idprojeto', 'sprint.titulo as descrsprint', 'sprint.idsprint', 'estoria_usuario.nome as descreu','usuario.nome as usuarionome', 'usuario.email as email')
         .where({'tarefa.idtarefa': id, 'usuario.idusuario' : idUsuario})
         .catch(err => {
             return err;
@@ -108,7 +145,7 @@ module.exports = {
         });
 
         EUNova = estoria_usuario.nome
-        idproje = TarefaAntiga.codproj
+        idproje = TarefaAntiga.idprojeto
 
         if( idsprint != null ) {
             const [sprint] = await connection('sprint')

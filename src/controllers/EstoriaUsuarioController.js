@@ -34,7 +34,7 @@ module.exports = {
 
 
     async create (request, response){
-        const { nome, status, persona, desejo, descricao, aceite, idprojeto} = request.body;
+        const { nome, status, persona, desejo, descricao,  idprojeto} = request.body;
         const id_usuario = request.headers.authorization;
 
         //IdEstoria, Nome, Status, Prioridade, Descricao, IdProjeto
@@ -44,7 +44,6 @@ module.exports = {
             persona, 
             desejo,
             descricao,
-            aceite,
             idprojeto,
         }).returning('idestoria').catch(err => {
             return err;
@@ -75,7 +74,7 @@ module.exports = {
 
     async update (request, response){
         const {id} = request.params;
-        const { nome, status, persona, desejo, descricao, aceite, idprojeto} = request.body;
+        const { nome, status, persona, desejo, descricao, idprojeto} = request.body;
         const idusuario = request.headers.authorization;
         let RegLog = '';
         let statusantigo = '';
@@ -106,8 +105,8 @@ module.exports = {
         }
 
         RegLog = "Alteração Feita por: " +  Euantiga.usuarionome + ", e-mail: "+ Euantiga.email 
-        +"  - Dado Antigo { Funcionalidade: " + Euantiga.nome + ", Status: " + statusantigo +  ', "Como um: '+ Euantiga.persona+', eu desejo: '+Euantiga.desejo + ', para: ' + Euantiga.descricao + '", critérios de aceite: '+ Euantiga.aceite + '}. Dado Novo {'+
-                ' Funcionalidade: '+ nome + ', Status: ' + statusnovo + ', "Como um: '+ persona+', eu desejo: '+desejo + ', para: ' + descricao +'", critérios de aceite: '+ aceite + '}'
+        +"  - Dado Antigo { Funcionalidade: " + Euantiga.nome + ", Status: " + statusantigo +  ', "Como um: '+ Euantiga.persona+', eu desejo: '+Euantiga.desejo + ', para: ' + Euantiga.descricao + '}. Dado Novo {'+
+                ' Funcionalidade: '+ nome + ', Status: ' + statusnovo + ', "Como um: '+ persona+', eu desejo: '+desejo + ', para: ' + descricao + '}'
         /* Fim do log manual */
 
         const [IdEstoria] = await connection('estoria_usuario').update({
@@ -116,7 +115,6 @@ module.exports = {
             persona, 
             desejo,
             descricao,
-            aceite,
             idprojeto,
         }).where('idestoria',id).returning('idestoria').catch(err => {
             return err;

@@ -11,6 +11,7 @@ const SprintController = require('./controllers/SprintController');
 const ProjetoController = require('./controllers/ProjetoController');
 const TarefaController  = require('./controllers/TarefaController');
 const LogsController  = require('./controllers/LogsController');
+const CriteriosController = require('./controllers/CriterioAceite');
 
 const routes = express.Router();
 
@@ -29,7 +30,7 @@ routes.post('/projetousuario', ProjetoController.insertUsuarioProjeto);
 routes.get('/projetousuario', ProjetoController.getProjetoUsuario);
 routes.delete('/projetousuario/:id', ProjetoController.deleteUsuarioProjeto);
 
-
+routes.delete('/tarefadelete/:id',TarefaController.delete);
 routes.get('/tarefa', TarefaController.index);
 routes.get('/doc', TarefaController.indexDoc);
 routes.get('/tarefa/:id', TarefaController.get);
@@ -43,17 +44,21 @@ routes.get('/estoria_usuario/:id', EstoriaUsuarioController.get);
 routes.delete('/estoria_usuario/:id',EstoriaUsuarioController.delete);
 routes.put('/estoria_usuario/:id',EstoriaUsuarioController.update);
 
+routes.put('/criterioaceite/:id', CriteriosController.get);
+routes.post('/criterioaceite', CriteriosController.create);
+routes.delete('/criterioaceite/:id', CriteriosController.delete);
+
 routes.get('/sprint', SprintController.index);
 routes.get('/sprint/:id', SprintController.get);
 routes.get('/processarSprints', SprintController.processarSprint);
 routes.post('/sprint', SprintController.create);
 routes.put('/sprint/:id', SprintController.update);
+routes.delete('/arquivar/:id', SprintController.arquivar);
 
 /* Não é o ideal mas acontece, são gets */
 routes.put('/logseu', LogsController.getLogEU);
 routes.put('/logstarefas', LogsController.getLogTarefa);
 routes.put('/logsprint', LogsController.getLogSprint);
 routes.put('/logprojetos', LogsController.getLogProjetos);
-
 
 module.exports = routes;

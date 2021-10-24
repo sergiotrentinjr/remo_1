@@ -14,7 +14,10 @@ module.exports = {
     async index(request, response){
         const id = request.headers.authorization;
 
-        const sprint = await connection('sprint').where('idprojeto',id).select('*');
+        const sprint = await connection('sprint')
+        .where('arquivado', 'N')
+        .where('idprojeto',id)
+        .select('*').orderBy('sprint.idsprint','desc');
 
         return response.json(sprint);
     },
@@ -89,7 +92,12 @@ module.exports = {
     async processarSprint(request, response){
         const idprojeto = request.headers.authorization;
 
-        const sprint = await connection('sprint').where('idprojeto',idprojeto).orderBy('dataini','asc').select('idsprint','estimativa').catch(err => {
+        const sprint = await connection('sprint')
+        .where('sprint.arquivado', 'N')
+        .where('idprojeto',idprojeto)
+        .orderBy('dataini','asc')
+        .select('idsprint','estimativa')
+        .catch(err => {
             return err;
         });
 
@@ -158,6 +166,52 @@ module.exports = {
         }
 
         return response.json({ sucesso: 'Operação efetuada com Sucesso!'});
+    },
+
+    async arquivar (request, response){
+        const {id} = request.params;
+        const idusuario = request.headers.authorization;
+        let ArquivoLogs = '';
+
+        console.log(id);
+        console.log(idusuario);
+        
+
+        const [SprintAntiga] = await connection('sprint')
+        .select('sprint.*')
+        .where('sprint.idsprint', id).catch(err => {
+            return err;
+        });
+
+        const [Usuario] = await connection('usuario')
+        .select('usuario.*')
+        .where('usuario.idusuario', idusuario).catch(err => {
+            return err;
+        });
+
+        ArquivoLogs = "Alteração Feita por: " +  Usuario.nome + ", e-mail: "+ Usuario.email +
+        "  - ARQUIVADO a Sprint:" + SprintAntiga.titulo
+
+        const [idsprint] = await connection('sprint').update({
+            arquivado : 'S'
+        }).where('idsprint',id).returning('idsprint').catch(err => {
+            return err;
+        });
+
+        if (idsprint <= 0 || idsprint == null) {
+            return response.status(401).json({ retorno: 'Houve Problemas na Alteração da Sprint!'});
+        }
+
+        await connection('log_tabelas').insert({
+            alteracao: ArquivoLogs, 
+            tabela: 'Sprint',
+            idprojeto : SprintAntiga.idprojeto
+        }).catch(err => {
+            return err;
+        });
+
+
+        return response.json({ retorno: 'Arquivação realizada com sucesso!' });
     },
 
 }; 

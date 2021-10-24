@@ -6,9 +6,9 @@ module.exports = {
 
     async create(request, response){
         const {email} = request.body;
-        const {senha} = request.body;
+        const {hash} = request.body;
 
-        const hash = crypto.createHmac('sha256', secret).update(senha).digest('hex')
+        //const hash = crypto.createHmac('sha256', secret).update(senha).digest('hex')
 
         const usuario = await connection('usuario').where('email',email).andWhere('senha',hash).select('*').first();
 
