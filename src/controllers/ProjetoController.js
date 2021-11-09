@@ -62,15 +62,15 @@ module.exports = {
 
         const [usuario] = await connection('usuario')
         .select('usuario.nome','usuario.email', 'usuario.idusuario').where('usuario.email',email).catch(err => {
-            return response.json({ error: 'E-mail informado não existe, por favor verifique!'});
+            return err;
         });
 
         if (!usuario){
-            return response.json({ error: 'E-mail informado não existe, por favor verifique!'});
+            return response.json({ retorno: 'Não foi possível cadastrar usuário. Por favor verifique o e-mail e tente novamente!'});
         }
 
         if (!(usuario.idusuario > 0)){
-            return response.json({ error: 'E-mail informado não existe, por favor verifique!'});
+            return response.json({ retorno: 'Não foi possível cadastrar usuário. Por favor verifique o e-mail e tente novamente!'});
         }
 
         const [id] = await connection('projeto_usuario').insert({
@@ -78,14 +78,14 @@ module.exports = {
             idusuario : usuario.idusuario,
             tipoacesso
         }).returning('idprojeto').catch(err => {
-            return response.json({ error: 'Erro ao relacionar usuário com o projeto!'});
+            return err;
         });
 
         if (id <= 0 || id == null) {
-            return response.json({ error: 'Erro ao relacionar usuário com o projeto!'});
+            return response.json({ retorno: 'Erro ao relacionar usuário com o projeto!'});
         }
         
-        return response.json({id: id});
+        return response.json({retorno: 'Usuário adicionado com sucesso!'});
     },
 
     async deleteUsuarioProjeto (request, response){

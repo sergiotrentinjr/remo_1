@@ -13,7 +13,7 @@ module.exports = {
         const usuario = await connection('usuario').where('email',email).andWhere('senha',hash).select('*').first();
 
         if (!usuario) {
-            return response.status(400).json({error: 'Nenhum Usuário encontrado com esse ID'})
+            return response.status(400).json({error: 'Nenhum Usuário encontrado com esse e-mail'})
         }
 
         return response.json(usuario);
