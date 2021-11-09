@@ -65,6 +65,10 @@ module.exports = {
             return err;
         });
 
+        if (!usuario){
+            return response.json({ error: 'E-mail informado não existe, por favor verifique!'});
+        }
+
         const [id] = await connection('projeto_usuario').insert({
             idprojeto,
             idusuario : usuario.idusuario,
@@ -74,7 +78,7 @@ module.exports = {
         });
 
         if (id <= 0 || id == null) {
-            return response.json({Error});
+            return response.json({ error: 'Erro ao relacionar usuário com o projeto!'});
         }
         
         return response.json({id});

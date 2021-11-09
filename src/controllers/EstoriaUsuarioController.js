@@ -46,15 +46,15 @@ module.exports = {
             descricao,
             idprojeto,
         }).returning('idestoria').catch(err => {
-            return err;
+            return response.json({ erro: "Houve problemas ao cadastrar!" });;
         });
 
         if( IdEstoria <= 0 || IdEstoria == null){
             IdEstoria = -406
-            console.log("error");
+            return response.json({ erro: -406 });
         }
 
-        return response.json({ IdEstoria })
+        return response.json({ sucesso: IdEstoria });
     },
 
     async delete (request, response){

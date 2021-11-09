@@ -147,7 +147,7 @@ module.exports = {
         EUNova = estoria_usuario.nome
         idproje = TarefaAntiga.idprojeto
 
-        if( idsprint != null ) {
+        if( idsprint != null &&  idsprint != '' ) {
             const [sprint] = await connection('sprint')
             .select('sprint.*')
             .where('sprint.idsprint', idsprint).catch(err => {
@@ -240,18 +240,40 @@ module.exports = {
 
         /* log manual */
 
-        
-        const idtarefa = await connection('tarefa').update({
-            descricao, 
-            status, 
-            estimativa, 
-            prioridade, 
-            frequenciauso,
-            idestoria, 
-            idsprint
-        }).where('idtarefa',id).returning('idtarefa').catch(err => {
-            return err;
-        });
+        if (idsprint == null || idsprint == ''){ 
+            const idtarefa = await connection('tarefa').update({
+                descricao, 
+                status, 
+                estimativa, 
+                prioridade, 
+                frequenciauso,
+                idestoria, 
+                idsprint: null
+            }).where('idtarefa',id).returning('idtarefa').catch(err => {
+                return err;
+            });
+
+            if (idtarefa <= 0 || idtarefa == null) {
+                return response.status(401).json({ error: 'Houve Problemas na Alteração da Tarefa!'});
+            }
+
+        }else{
+            const idtarefa = await connection('tarefa').update({
+                descricao, 
+                status, 
+                estimativa, 
+                prioridade, 
+                frequenciauso,
+                idestoria, 
+                idsprint
+            }).where('idtarefa',id).returning('idtarefa').catch(err => {
+                return err;
+            });
+
+            if (idtarefa <= 0 || idtarefa == null) {
+                return response.status(401).json({ error: 'Houve Problemas na Alteração da Tarefa!'});
+            }
+        }
 
         await connection('log_tabelas').insert({
             alteracao: Logs, 
@@ -261,11 +283,8 @@ module.exports = {
             return err;
         });
 
-        if (idtarefa <= 0 || idtarefa == null) {
-            return response.status(401).json({ error: 'Houve Problemas na Alteração da Tarefa!'});
-        }
-
-        return response.json({ idtarefa: idtarefa });
+        
+        return response.json({ sucesso: "Registro alterado com sucesso!" });
     },
 
 }; 

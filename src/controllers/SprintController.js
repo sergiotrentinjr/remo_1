@@ -101,6 +101,8 @@ module.exports = {
             return err;
         });
 
+        console.log(sprint);
+
 
         const tarefas =  await connection('tarefa')
         .join('estoria_usuario', 'estoria_usuario.idestoria', '=', 'tarefa.idestoria')
@@ -110,7 +112,6 @@ module.exports = {
         .where('estoria_usuario.idprojeto',idprojeto).catch(err => {
             return err;
         });
-
 
         //Mais complexo o SQL de banco do que fazer esse FOR
         for(var i = 0; i < tarefas.length; i++){
@@ -123,29 +124,32 @@ module.exports = {
                 return new Number(b.ordem) - new Number(a.ordem); // descending
             } )
         }
+
+        var idSPRINT = 0;
+        var CapacidadeSprint = 0;
+        var CapacidadeSobra = 0;
         
         for(var i = 0; i < sprint.length; i++){
 
-            var idSPRINT = sprint[i].idsprint;
-            var CapacidadeSprint = sprint[i].estimativa;
-            var CapacidadeSobra = 0;
+            idSPRINT = sprint[i].idsprint;
+            CapacidadeSprint = sprint[i].estimativa;
+            CapacidadeSobra = 0;
 
             const [CapacideAlocadaAtual] = await connection('tarefa').where('idsprint',idSPRINT).sum('estimativa');
 
-            if (CapacideAlocadaAtual.sum > 0) {
-                CapacidadeSobra = CapacidadeSprint - CapacideAlocadaAtual
+            if (CapacideAlocadaAtual.sum != null && parseFloat(CapacideAlocadaAtual.sum) > 0) {
+                CapacidadeSobra = parseFloat(CapacidadeSprint) - parseFloat(CapacideAlocadaAtual.sum)
             } else {
-                CapacidadeSobra = CapacidadeSprint
+                CapacidadeSobra = parseFloat(CapacidadeSprint)
             }
-
         
             for( var j = 0; j < tarefas.length; j++){
             
                 if( tarefas[j].usado == 'S') continue
 
-                if(CapacidadeSobra >= tarefas[j].estimativa){
+                if(parseFloat(CapacidadeSobra) >= parseFloat(tarefas[j].estimativa)){
                     
-                    CapacidadeSobra = CapacidadeSobra - tarefas[j].estimativa
+                    CapacidadeSobra = parseFloat(CapacidadeSobra) - parseFloat(tarefas[j].estimativa)
 
                     const [idtarf] = await connection('tarefa').update({ 
                         idsprint : idSPRINT
@@ -158,11 +162,8 @@ module.exports = {
                     }
 
                     tarefas[j].usado = 'S'
-
                 }
-
             } 
-
         }
 
         return response.json({ sucesso: 'Operação efetuada com Sucesso!'});
@@ -172,10 +173,6 @@ module.exports = {
         const {id} = request.params;
         const idusuario = request.headers.authorization;
         let ArquivoLogs = '';
-
-        console.log(id);
-        console.log(idusuario);
-        
 
         const [SprintAntiga] = await connection('sprint')
         .select('sprint.*')
