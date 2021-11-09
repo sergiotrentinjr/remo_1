@@ -68,7 +68,7 @@ module.exports = {
         console.log(!usuario);
 
         if (!usuario || usuario == null){
-            return response.json({ retorno: 'Não foi possível cadastrar usuário. Por favor verifique o e-mail e tente novamente!'});
+            return err;
         }
 
         const [id] = await connection('projeto_usuario').insert({
@@ -79,10 +79,6 @@ module.exports = {
             return err;
         });
 
-        if (id <= 0 || id == null) {
-            return response.json({ retorno: 'Erro ao relacionar usuário com o projeto!'});
-        }
-        
         return response.json({retorno: 'Usuário adicionado com sucesso!'});
     },
 
