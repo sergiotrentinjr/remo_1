@@ -65,11 +65,9 @@ module.exports = {
             return err;
         });
 
-        if (!usuario){
-            return response.json({ retorno: 'Não foi possível cadastrar usuário. Por favor verifique o e-mail e tente novamente!'});
-        }
+        console.log(!usuario);
 
-        if (!(usuario.idusuario > 0)){
+        if (!usuario || usuario == null){
             return response.json({ retorno: 'Não foi possível cadastrar usuário. Por favor verifique o e-mail e tente novamente!'});
         }
 
