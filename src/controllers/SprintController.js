@@ -1,7 +1,5 @@
 const { create } = require("./UsuarioController");
-
 const connection = require('../database/connection');
-
 
 module.exports = {
 

@@ -62,10 +62,14 @@ module.exports = {
 
         const [usuario] = await connection('usuario')
         .select('usuario.nome','usuario.email', 'usuario.idusuario').where('usuario.email',email).catch(err => {
-            return err;
+            return response.json({ error: 'E-mail informado não existe, por favor verifique!'});
         });
 
         if (!usuario){
+            return response.json({ error: 'E-mail informado não existe, por favor verifique!'});
+        }
+
+        if (!(usuario.idusuario > 0)){
             return response.json({ error: 'E-mail informado não existe, por favor verifique!'});
         }
 
@@ -74,22 +78,19 @@ module.exports = {
             idusuario : usuario.idusuario,
             tipoacesso
         }).returning('idprojeto').catch(err => {
-            return err;
+            return response.json({ error: 'Erro ao relacionar usuário com o projeto!'});
         });
 
         if (id <= 0 || id == null) {
             return response.json({ error: 'Erro ao relacionar usuário com o projeto!'});
         }
         
-        return response.json({id});
+        return response.json({id: id});
     },
 
     async deleteUsuarioProjeto (request, response){
         const {id} = request.params;
         const idprojeto = request.headers.authorization;
-
-        console.log(id)
-        console.log(idprojeto)
 
         const estoria_usuario = await connection('projeto_usuario').where('idusuario', id).select('idusuario').first();
 
