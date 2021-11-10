@@ -26,7 +26,7 @@ routes.get('/projeto', ProjetoController.index);
 routes.get('/projeto/:id', ProjetoController.get);
 routes.post('/projeto', ProjetoController.create);
 routes.put('/projeto/:id', ProjetoController.update);
-routes.post('/projetousuario', ProjetoController.insertUsuarioProjeto);
+routes.put('/projetousuario', ProjetoController.insertUsuarioProjeto);
 routes.get('/projetousuario', ProjetoController.getProjetoUsuario);
 routes.delete('/projetousuario/:id', ProjetoController.deleteUsuarioProjeto);
 

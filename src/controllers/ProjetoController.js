@@ -64,11 +64,9 @@ module.exports = {
             return err;
         });;
 
-        console.log(usuarios);
-
-        if (usuarios == "undefined" || (!usuarios) || usuarios == undefined) {
-            return response.json({retorno: "Opss Houve algum problema! Verifique o e-mail e tente novamente!"});
-         }
+        if (usuarios == 'undefined' || usuarios == undefined || !(usuarios)){
+            return response.status(401).json({ error: 'Houve problemas ao adicionar usuário. Verifique o e-mail e tente novamente!'});
+        }
 
         await connection('projeto_usuario').insert({
             idprojeto,
@@ -77,8 +75,8 @@ module.exports = {
         }).catch(err => {
             return err;
         });
-
-        return response.json({retorno: 'Usuário adicionado com sucesso!'});
+        
+        return response.json({sucesso: 'Usuário adicionado com sucesso!'});
     },
 
     async deleteUsuarioProjeto (request, response){
