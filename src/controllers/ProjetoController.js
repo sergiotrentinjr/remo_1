@@ -60,13 +60,13 @@ module.exports = {
         
         const tipoacesso = 1
 
-        const [usuario] = await connection('usuario')
+        const usuario = await connection('usuario')
         .select('usuario.nome','usuario.email', 'usuario.idusuario').where('usuario.email',email).catch(err => {
             return err;
         });
 
         if (usuario) {
-            if (!(usuario.idusuario > 0)) return response.json({retorno: 'E-mail já cadastrado!'});
+            if (!(usuario.idusuario > 0)) return response.json({retorno: 'Houve problemas para adicionar o usuário! Por favor, verifique o e-mail e tente novamente!'});
         }
 
         const [id] = await connection('projeto_usuario').insert({
