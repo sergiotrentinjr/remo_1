@@ -65,10 +65,8 @@ module.exports = {
             return err;
         });
 
-        console.log(!usuario);
-
-        if (!usuario || usuario == null){
-            return err;
+        if (usuario) {
+            if (!(usuario.idusuario > 0)) return response.json({retorno: 'E-mail já cadastrado!'});
         }
 
         const [id] = await connection('projeto_usuario').insert({
