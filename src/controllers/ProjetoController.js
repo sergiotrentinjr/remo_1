@@ -60,20 +60,21 @@ module.exports = {
         
         const tipoacesso = 1
 
-        const usuario = await connection('usuario')
-        .select('usuario.nome','usuario.email', 'usuario.idusuario').where('usuario.email',email).catch(err => {
+        const [usuarios] = await connection('usuario').select('*').where('email',email).catch(err => {
             return err;
-        });
+        });;
 
-        if (usuario) {
-            if (!(usuario.idusuario > 0)) return response.json({retorno: 'Houve problemas para adicionar o usuário! Por favor, verifique o e-mail e tente novamente!'});
-        }
+        console.log(usuarios);
 
-        const [id] = await connection('projeto_usuario').insert({
+        if (usuarios == "undefined" || (!usuarios) || usuarios == undefined) {
+            return response.json({retorno: "Opss Houve algum problema! Verifique o e-mail e tente novamente!"});
+         }
+
+        await connection('projeto_usuario').insert({
             idprojeto,
-            idusuario : usuario.idusuario,
+            idusuario : usuarios.idusuario,
             tipoacesso
-        }).returning('idprojeto').catch(err => {
+        }).catch(err => {
             return err;
         });
 
