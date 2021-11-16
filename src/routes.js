@@ -47,6 +47,7 @@ routes.put('/estoria_usuario/:id',EstoriaUsuarioController.update);
 routes.put('/criterioaceite/:id', CriteriosController.get);
 routes.post('/criterioaceite', CriteriosController.create);
 routes.delete('/criterioaceite/:id', CriteriosController.delete);
+routes.get('/criterioaceitedoc', CriteriosController.index);
 
 routes.get('/sprint', SprintController.index);
 routes.get('/sprint/:id', SprintController.get);

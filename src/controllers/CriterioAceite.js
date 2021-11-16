@@ -50,4 +50,19 @@ module.exports = {
         return response.status(204).json({ retorno: 'Critério excluido com Sucesso!'});
     },
 
+    async index(request, response){
+        const idprojeto = request.headers.authorization;
+
+        const criterios = await connection('criterio_aceite')
+        .join('estoria_usuario', 'estoria_usuario.idestoria', '=', 'criterio_aceite.idestoria')
+        .select('criterio_aceite.cenario as cenario',
+        'criterio_aceite.dado as dado',
+        'criterio_aceite.quando as quando',
+        'criterio_aceite.entao as entao',
+        'criterio_aceite.idestoria as idestoria')
+        .where('estoria_usuario.idprojeto', idprojeto);
+
+        return response.json(criterios);
+    },
+
 }
