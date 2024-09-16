@@ -5,17 +5,13 @@ const routes = require('./routes');
 
 const app = express();
 
-const environment = process.env.NODE_ENV || 'development';
 
-//if (environment == 'development'){
-//  app.use(cors());
-//}else{
-  app.use(cors({
-      origin: '*'
-  }));
-//}
+app.use(cors({
+  origin: '*'
+}));
 
-app.use(express.json());
+
+app.use(express.json({ extended: false }));
 app.use(routes);
 
 
